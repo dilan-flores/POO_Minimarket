@@ -1,14 +1,17 @@
 import javax.swing.*;
 
 public class Admin_ventas {
-    private JFormattedTextField UsuarioCajero;
+    private JFormattedTextField textCAJERO;
     private JButton buscarButton;
-    private JTable table1;
-    private JFormattedTextField formattedTextField1;
-    private JFormattedTextField formattedTextField2;
+    private JTable table;
+    private JFormattedTextField textNOMBRE;
+    private JFormattedTextField textAPELLIDO;
     private JButton revisarVentasButton;
-    private JFormattedTextField formattedTextField3;
     private JPanel Panel;
+    private JFormattedTextField textCELULAR;
+    private JButton cerrarButton;
+    private JComboBox id_cajero;
+
     public static void main(String[] args) {
         JFrame ventana = new JFrame("Ingresar cajero");
         ventana.setBounds(0, 0, 550, 550);

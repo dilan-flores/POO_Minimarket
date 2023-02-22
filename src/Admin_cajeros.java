@@ -1,25 +1,40 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 public class Admin_cajeros {
-    private JTable table1;
+
     private JButton agregarButton;
-    private JFormattedTextField formattedTextField1;
-    private JFormattedTextField formattedTextField2;
-    private JFormattedTextField formattedTextField3;
-    private JFormattedTextField formattedTextField4;
+    private JFormattedTextField textID_CAJERO;
+    private JFormattedTextField textNOMBRE;
+    private JFormattedTextField textAPELLIDO;
+    private JFormattedTextField textCELULAR;
     private JButton buscarButton;
-    private JPanel Panel;
+    public JPanel Panel;
+    private JFormattedTextField textDIRECCION;
+    private JFormattedTextField textFEC_NAC;
+    private JFormattedTextField textUSUARIO;
+    private JFormattedTextField testCONTRA;
+    private JButton cerrarButton;
+    private JTable table;
+
+    DefaultTableModel modelo = new DefaultTableModel();
+
+    public Admin_cajeros(){
+        String[] titulo = new String[]{"ID", "NOMBRES", "APRELLIDOS", "TELÉFONO", "DIRECCION", "FECHA NACIMIENTO", "USUARIO"};
+        modelo.setColumnIdentifiers(titulo);
+        table.setModel(modelo);
+    }
 
     public static void main(String[] args) {
-        JFrame ventana = new JFrame("Ingresar cajero");
-        ventana.setBounds(0, 0, 550, 550);
-        ventana.setContentPane(new Admin_cajeros().Panel);
-        ventana.setLocationRelativeTo(null);
-        ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        /*ventana.add(Panel);*/
-        /*aplicacion.setSize(0,0,500,500);*/
-        ventana.setVisible(true);
         /*
         uso de combo box para guardar o comparar información de bases de datos, borrar todos los cmpos de un interfaz
          */
+        JFrame frame=new JFrame("ADMINISTRAR CAJERO");
+        frame.setContentPane(new Admin_cajeros().Panel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.pack();
+        frame.setBounds(0,0,1000, 800);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 }
