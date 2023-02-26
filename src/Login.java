@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.sql.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-public class Login {
+public class Login extends cajero_producto{
     Statement s;
     ResultSet rs;
     PreparedStatement ps;
@@ -135,6 +135,7 @@ public class Login {
                  */
             }
         });
+        System.out.println(textUSUARIO.getText());
     }
     public static Connection getConection()
     {

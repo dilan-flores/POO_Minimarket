@@ -1,8 +1,14 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.*;
 
 public class Admin_cajeros {
-
+    Statement s;
+    ResultSet rs;
+    ResultSetMetaData rsmd;
+    PreparedStatement ps;
     private JButton agregarButton;
     private JFormattedTextField textID_CAJERO;
     private JFormattedTextField textNOMBRE;
@@ -18,11 +24,132 @@ public class Admin_cajeros {
     private JTable table;
 
     DefaultTableModel modelo = new DefaultTableModel();
+    Boolean encontrado = false;
 
     public Admin_cajeros(){
+        /*
         String[] titulo = new String[]{"ID", "NOMBRES", "APRELLIDOS", "TELÉFONO", "DIRECCION", "FECHA NACIMIENTO", "USUARIO"};
         modelo.setColumnIdentifiers(titulo);
         table.setModel(modelo);
+        */
+        try{
+            Connection conexion;
+            conexion = getConection();
+            s = conexion.createStatement();
+            rs = s.executeQuery("SELECT * FROM cajero ");
+
+            rsmd = rs.getMetaData();
+            int columnCount = rsmd.getColumnCount();
+
+
+            // Create JTable and set model
+            /*table = new JTable();*/
+            modelo = (DefaultTableModel) table.getModel();
+
+            // Add columns to table model
+            for (int i = 1; i <= columnCount; i++) {
+                modelo.addColumn(rsmd.getColumnName(i));
+            }
+
+            while (rs.next()) {
+                Object[] row = new Object[columnCount];
+                for (int i = 1; i <= columnCount; i++) {
+                    row[i - 1] = rs.getObject(i);
+                }
+                modelo.addRow(row);
+            }
+            rs.close();
+            s.close();
+            conexion.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        buscarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Connection conexion;
+                    conexion = getConection();
+
+                    String id = "\"" + textID_CAJERO.getText() + "\"";
+                    s = conexion.createStatement();
+                    rs = s.executeQuery("SELECT * FROM cajero WHERE id_caj =" + id);
+
+                    encontrado = false;
+                    while (rs.next()) {
+                        textNOMBRE.setText(rs.getString(2));
+                        textAPELLIDO.setText(rs.getString(3));
+                        textCELULAR.setText(rs.getString(4));
+                        textDIRECCION.setText(rs.getString(5));
+                        textFEC_NAC.setText(rs.getString(6));
+                        encontrado = true;
+                    }
+
+                    if(!encontrado){
+                        JOptionPane.showMessageDialog(null, "PRODUCTO NO ENCONTRADOS");
+                    }
+                    conexion.close();
+                    rs.close();
+                    s.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }); /*FIN BUSCAR PRODUCTO*/
+
+        agregarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+
+                    Connection conexion;
+                    conexion = getConection();
+
+                    ps = conexion.prepareStatement("Insert into cajero values (?,?,?,?,?)");
+                    ps.setString(1, textID_CAJERO.getText());
+                    ps.setString(2, textNOMBRE.getText());
+                    ps.setString(3, textAPELLIDO.getText());
+                    ps.setString(4, textCELULAR.getText());
+                    ps.setString(5, textFEC_NAC.getText());
+
+                    int res = ps.executeUpdate();
+                    if(res >0){
+                        JOptionPane.showMessageDialog(null,"CABECERA DE FACTURA");
+                    }else{
+                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                    }
+
+                    conexion.close();
+                    ps.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                try {
+
+                    Connection conexion;
+                    conexion = getConection();
+
+                    ps = conexion.prepareStatement("Insert into login_cajero values (?,?,?)");
+                    ps.setString(1, textID_CAJERO.getText());
+                    ps.setString(2, textUSUARIO.getText());
+                    ps.setString(3, testCONTRA.getText());
+
+                    int res = ps.executeUpdate();
+                    if(res >0){
+                        JOptionPane.showMessageDialog(null,"CABECERA DE FACTURA");
+                    }else{
+                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                    }
+
+                    conexion.close();
+                    ps.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 
     public static void main(String[] args) {
@@ -36,5 +163,20 @@ public class Admin_cajeros {
         frame.setBounds(0,0,1000, 800);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+    public static Connection getConection()
+    {
+        Connection conexion = null;
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            conexion = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/minimarket", "root", "3001a"
+            );
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return conexion;
     }
 }
