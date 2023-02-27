@@ -14,7 +14,7 @@ public class Admin_stock {
     private JFormattedTextField textPRODUCTO;
     private JFormattedTextField textPRECIO;
     private JFormattedTextField textCANTIDAD;
-    private JButton agregarMásButton;
+    private JButton agregarMasButton;
     public JPanel Panel;
     private JButton agregarNuevoButton;
     private JButton buscarButton;
@@ -95,7 +95,7 @@ public class Admin_stock {
             }
         }); /*FIN BUSCAR PRODUCTO*/
 
-        agregarMásButton.addActionListener(new ActionListener() {
+        agregarMasButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -115,16 +115,18 @@ public class Admin_stock {
                     int res = ps.executeUpdate();
                     if(res >0){
                         JOptionPane.showMessageDialog(null,"PRODUCTO" + textCODIGO.getText() + " ACTUALIZADO");
+                        modelo.setColumnCount(0);
+                        modelo.setRowCount(0);
                     }else{
                         JOptionPane.showMessageDialog(null,"NO GUARDADO");
                     }
                     conexion.close();//importante!!!!
 
+
                     ps.close();
                 }catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                /*
                 try{
                     Connection conexion;
                     conexion = getConection();
@@ -139,9 +141,6 @@ public class Admin_stock {
                     // Create JTable and set model
                     modelo = (DefaultTableModel) table.getModel();
 
-                    for (int i = 1; i <= columnCount; i++) {
-                        modelo.removeRow(i);
-                    }
                     for (int i = 1; i <= columnCount; i++) {
                         modelo.addColumn(rsmd.getColumnName(i));
                     }
@@ -159,7 +158,6 @@ public class Admin_stock {
                 }catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                 */
             }
         });
 
@@ -181,6 +179,8 @@ public class Admin_stock {
                     int res = ps.executeUpdate();
                     if(res >0){
                         JOptionPane.showMessageDialog(null,"CABECERA DE FACTURA");
+                        modelo.setColumnCount(0);
+                        modelo.setRowCount(0);
                     }else{
                         JOptionPane.showMessageDialog(null,"NO GUARDADO");
                     }
@@ -190,9 +190,7 @@ public class Admin_stock {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                modelo.setRowCount(0);
 
-                /*
                 try{
                     Connection conexion;
                     conexion = getConection();
@@ -203,17 +201,7 @@ public class Admin_stock {
                     rsmd = rs.getMetaData();
                     int columnCount = rsmd.getColumnCount();
 
-
-
                     modelo = (DefaultTableModel) table.getModel();
-
-                    int fila = table.getSelectedRow();
-                    modelo.removeRow(fila);
-                    modelo.addColumn(rsmd.getColumnName(fila));
-                    
-                    for (int i = 1; i <= columnCount; i++) {
-                        modelo.removeRow(i);
-                    }
 
                     // Add columns to table model
                     for (int i = 1; i <= columnCount; i++) {
@@ -233,9 +221,22 @@ public class Admin_stock {
                 }catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                 */
+
             }
         });
+
+        cerrarButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR*/
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Admin admin= new Admin();
+                admin.setName("MENU-ADMINISTRADOR");
+                admin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                admin.pack();
+                admin.setBounds(0,0,1000, 800);
+                admin.setLocationRelativeTo(null);
+                admin.setVisible(true);
+            }
+        }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
 
 

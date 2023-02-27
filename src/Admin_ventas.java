@@ -45,6 +45,7 @@ public class Admin_ventas {
         buscarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                encontrado=false;
                 try {
 
                     Connection conexion;
@@ -57,9 +58,14 @@ public class Admin_ventas {
 
 
                     while (rs.next()) {
-                            textNOMBRE.setText(rs.getString(2));
-                            textAPELLIDO.setText(rs.getString(3));
-                            textCELULAR.setText(rs.getString(4)); /*Captura los datos de cantidad*/
+                        textNOMBRE.setText(rs.getString(2));
+                        textAPELLIDO.setText(rs.getString(3));
+                        textCELULAR.setText(rs.getString(4)); /*Captura los datos de cantidad*/
+                        encontrado = true;
+                    }
+
+                    if(!encontrado){
+                        JOptionPane.showMessageDialog(null, "CAJERO NO ENCONTRADOS");
                     }
                     conexion.close();
                     rs.close();
@@ -73,6 +79,8 @@ public class Admin_ventas {
         revisarVentasButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                modelo.setColumnCount(0);
+                modelo.setRowCount(0);
                 try{
                     Connection conexion;
                     conexion = getConection();
@@ -83,7 +91,6 @@ public class Admin_ventas {
 
                     rsmd = rs.getMetaData();
                     int columnCount = rsmd.getColumnCount();
-
 
                     modelo = (DefaultTableModel) table.getModel();
 
@@ -106,6 +113,18 @@ public class Admin_ventas {
                 }
             }
         });
+        cerrarButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR*/
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Admin admin= new Admin();
+                admin.setName("MENU-ADMINISTRADOR");
+                admin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                admin.pack();
+                admin.setBounds(0,0,1000, 800);
+                admin.setLocationRelativeTo(null);
+                admin.setVisible(true);
+            }
+        }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
 
     public static void main(String[] args) {

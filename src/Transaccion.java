@@ -1,12 +1,13 @@
 import javax.swing.*;
 import javax.swing.table.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.*;
 
 public class Transaccion {
     Statement s;
     ResultSet rs;
     ResultSetMetaData rsmd;
-    PreparedStatement ps;
     public JPanel Panel;
     private JFormattedTextField textFECHA;
     private JFormattedTextField textFACTURA;
@@ -22,7 +23,6 @@ public class Transaccion {
     private JFormattedTextField textNOMBRE;
     private JFormattedTextField textCELULAR;
     private JTable table;
-    private JPanel Panel_cliente;
     private JButton cerrarButton;
 
     DefaultTableModel modelo = new DefaultTableModel();
@@ -118,6 +118,19 @@ public class Transaccion {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        cerrarButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR*/
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame frame=new JFrame("CAJERO_PRODUCTO");
+                frame.setContentPane(new cajero_producto().panel);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setBounds(0,0,1000, 800);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            }
+        }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
 
     }
 

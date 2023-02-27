@@ -105,12 +105,12 @@
           <text value="Stock"/>
         </properties>
       </component>
-      <component id="5c6ac" class="javax.swing.JButton" binding="agregarMásButton" default-binding="true">
+      <component id="5c6ac" class="javax.swing.JButton" binding="agregarMasButton">
         <constraints>
           <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Agregar más"/>
+          <text value="Agregar mas"/>
         </properties>
       </component>
       <component id="c928e" class="javax.swing.JLabel">

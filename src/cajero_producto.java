@@ -3,9 +3,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-
+/*
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+*/
 
 public class cajero_producto{
     Statement s;
@@ -48,11 +49,10 @@ public class cajero_producto{
 
 
     public cajero_producto(){
-        DecimalFormat df= new DecimalFormat("#.00");
         textCANTIDAD_A_COMPRAR.setEnabled(false);
-        textCAJERO.setText("50");
-        descuento_f.setText("0.25");
-        textFECHA.setText("2020-08-05");
+        /*textCAJERO.setText("50");*/
+        descuento_f.setText("1.25");
+        /*textFECHA.setText("2020-08-05");*/
         buscarCLIENTE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -302,15 +302,16 @@ public class cajero_producto{
                     conexion = getConection();
                     n_factura.setText("002 001 123456790");
 
-                    String fac= "\"" + n_factura +"\"";
+                    String fac= "\"" + n_factura.getText() +"\"";
                     ps = conexion.prepareStatement("UPDATE cab_trans SET num_f = ?,fecha_f = ?,FKid_caj= ?,subtotal_f =?,iva_f =?,descuento_f=?,total_f=?  WHERE num_f =" + fac );
-                    ps.setString(1, "\""+n_factura.getText()+"\"");
-                    ps.setString(2, "\""+textFECHA.getText()+"\"");
-                    ps.setString(3, "\""+textCAJERO.getText()+"\"");
+                    ps.setString(1, n_factura.getText());
+                    ps.setString(2, textFECHA.getText());
+                    ps.setString(3, textCAJERO.getText());
                     ps.setString(4, subtotal_f.getText());
                     ps.setString(5, iva_f.getText());
                     ps.setString(6, descuento_f.getText());
                     ps.setString(7, total_f.getText());
+                    System.out.println(ps);
 
                     int res = ps.executeUpdate();
                     if(res >0){
@@ -325,21 +326,34 @@ public class cajero_producto{
                 }catch (Exception ex) {
                     ex.printStackTrace();
                 }
+
+                /*AL GUARDAR SE ABRE LA VENTANA CON LA TRANSACCION REALIZADA*/
+                JFrame frame=new JFrame("Transaccion");
+                frame.setContentPane(new Transaccion().Panel);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setBounds(0,0,1000, 800);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
             }
         }); /*FIN GUARDAR PRODCUTOS*/
 
-        JFrame frame=new JFrame("Transaccion");
-        frame.setContentPane(new Transaccion().Panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setBounds(0,0,1000, 800);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        cerrarCajaButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR*/
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame frame=new JFrame("LOGIN");
+                frame.setContentPane(new Login().PanelLogin);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setBounds(0,0,600, 400);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            }
+        }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
 
     public void agregar(){
         modelo.addRow(new Object[]{textCODIGO.getText(),textPRODUCTO.getText(),textCANTIDAD_A_COMPRAR.getText(),precio_total_producto.getText()});
-
     }
 
     public void eliminar() {

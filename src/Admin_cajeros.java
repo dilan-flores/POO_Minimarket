@@ -68,6 +68,7 @@ public class Admin_cajeros {
         buscarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                encontrado=false;
                 try {
                     Connection conexion;
                     conexion = getConection();
@@ -115,7 +116,7 @@ public class Admin_cajeros {
 
                     int res = ps.executeUpdate();
                     if(res >0){
-                        JOptionPane.showMessageDialog(null,"CABECERA DE FACTURA");
+                        JOptionPane.showMessageDialog(null,"CAJERO INGRESADO CON ÉXITO");
                     }else{
                         JOptionPane.showMessageDialog(null,"NO GUARDADO");
                     }
@@ -127,7 +128,6 @@ public class Admin_cajeros {
                 }
 
                 try {
-
                     Connection conexion;
                     conexion = getConection();
 
@@ -139,6 +139,8 @@ public class Admin_cajeros {
                     int res = ps.executeUpdate();
                     if(res >0){
                         JOptionPane.showMessageDialog(null,"CABECERA DE FACTURA");
+                        modelo.setColumnCount(0);
+                        modelo.setRowCount(0);
                     }else{
                         JOptionPane.showMessageDialog(null,"NO GUARDADO");
                     }
@@ -148,8 +150,54 @@ public class Admin_cajeros {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+
+                try{ /*CARGAR NUEVAMENTE LOS DATOS DE CAJEROS*/
+                    Connection conexion;
+                    conexion = getConection();
+                    s = conexion.createStatement();
+                    rs = s.executeQuery("SELECT * FROM cajero ");
+
+                    rsmd = rs.getMetaData();
+                    int columnCount = rsmd.getColumnCount();
+
+
+                    // Create JTable and set model
+                    /*table = new JTable();*/
+                    modelo = (DefaultTableModel) table.getModel();
+
+                    // Add columns to table model
+                    for (int i = 1; i <= columnCount; i++) {
+                        modelo.addColumn(rsmd.getColumnName(i));
+                    }
+
+                    while (rs.next()) {
+                        Object[] row = new Object[columnCount];
+                        for (int i = 1; i <= columnCount; i++) {
+                            row[i - 1] = rs.getObject(i);
+                        }
+                        modelo.addRow(row);
+                    }
+                    rs.close();
+                    s.close();
+                    conexion.close();
+                }catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
+
+        cerrarButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR*/
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Admin admin= new Admin();
+                admin.setName("MENU-ADMINISTRADOR");
+                admin.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                admin.pack();
+                admin.setBounds(0,0,1000, 800);
+                admin.setLocationRelativeTo(null);
+                admin.setVisible(true);
+            }
+        }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
 
     public static void main(String[] args) {
