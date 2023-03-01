@@ -239,7 +239,6 @@ public class Admin_stock {
         }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
 
-
     public static void main(String[] args) {
         /*
         uso de combo box para guardar o comparar información de bases de datos, borrar todos los cmpos de un interfaz

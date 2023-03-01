@@ -32,27 +32,50 @@ public class cajero_producto{
     private JTable table;
     private JButton cerrarCajaButton;
     private JFormattedTextField textCAJERO;
-    private JFormattedTextField textFECHA;
+    /*private JFormattedTextField textFECHA;*/
     DefaultTableModel modelo = new DefaultTableModel();
     boolean encontrado; // verifica si se encontro el cliente
     JFormattedTextField precio_total_producto = new JFormattedTextField(); /*Precio de un producto (cantidad * precio_unit)*/
-    JFormattedTextField n_factura = new JFormattedTextField(); /* define el nùmero de factura*/
     JFormattedTextField actualizar_cantidad = new JFormattedTextField();/*actualizacón de cantidad de productos en stock*/
     JFormattedTextField subtotal_f = new JFormattedTextField();
     JFormattedTextField iva_f = new JFormattedTextField();
     JFormattedTextField descuento_f = new JFormattedTextField();
     JFormattedTextField total_f = new JFormattedTextField();
+    JFormattedTextField Num_factura = new JFormattedTextField();
 
     String SUBTOTAL = String.valueOf(0.0);
     String IVA = String.valueOf(0.0);
     String TOTAL= String.valueOf(0.0);
 
 
-    public cajero_producto(){
-        textCANTIDAD_A_COMPRAR.setEnabled(false);
-        /*textCAJERO.setText("50");*/
-        descuento_f.setText("1.25");
-        /*textFECHA.setText("2020-08-05");*/
+    public cajero_producto() {
+
+        descuento_f.setText("0.10");
+
+        try{ /*Nombre del cajero*/
+            Connection conexion;
+            conexion = getConection();
+
+            s = conexion.createStatement();
+            rs = s.executeQuery("Select nombres_caj,apellidos_caj from cajero where id_caj = (Select FKid_caj from cab_trans ORDER by num_f DESC LIMIT 1)");
+
+            while (rs.next()) {
+                textCAJERO.setText(rs.getString(1) + " " + rs.getString(2));
+            }
+
+            rs = s.executeQuery("Select num_f from cab_trans ORDER by num_f DESC LIMIT 1");
+
+            while (rs.next()) {
+                Num_factura.setText(rs.getString(1));
+            }
+
+            conexion.close();
+            rs.close();
+            s.close();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+
         buscarCLIENTE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -218,9 +241,8 @@ public class cajero_producto{
                     Connection conexion;
                     conexion = getConection();
 
-                    n_factura.setText("002 001 123456790");
                     ps = conexion.prepareStatement("Insert into det_trans values (?,?,?,?)");
-                    ps.setString(1, n_factura.getText());
+                    ps.setString(1, Num_factura.getText());
                     ps.setString(2, textCODIGO.getText());
                     ps.setString(3, textCANTIDAD_A_COMPRAR.getText());
                     ps.setString(4, precio_total_producto.getText());
@@ -287,7 +309,6 @@ public class cajero_producto{
                 /*ACTUALIZA CABECERA DE TRANSACCIÓN*/
                 try{
                     SUBTOTAL = SUBTOTAL.substring(0,3);
-
                     subtotal_f.setText(SUBTOTAL);
 
                     IVA = String.valueOf(Double.parseDouble(SUBTOTAL) * 0.12);
@@ -300,18 +321,19 @@ public class cajero_producto{
 
                     Connection conexion;
                     conexion = getConection();
-                    n_factura.setText("002 001 123456790");
 
-                    String fac= "\"" + n_factura.getText() +"\"";
-                    ps = conexion.prepareStatement("UPDATE cab_trans SET num_f = ?,fecha_f = ?,FKid_caj= ?,subtotal_f =?,iva_f =?,descuento_f=?,total_f=?  WHERE num_f =" + fac );
-                    ps.setString(1, n_factura.getText());
-                    ps.setString(2, textFECHA.getText());
-                    ps.setString(3, textCAJERO.getText());
-                    ps.setString(4, subtotal_f.getText());
-                    ps.setString(5, iva_f.getText());
-                    ps.setString(6, descuento_f.getText());
-                    ps.setString(7, total_f.getText());
+                    String fac= "\"" + Num_factura.getText() +"\"";
+                    ps = conexion.prepareStatement("UPDATE cab_trans SET fecha_f= concat(DATE(NOW()),\" \", TIME(NOW())),subtotal_f =?,iva_f =?,descuento_f=?,total_f=?,  FKci_cl = ? WHERE num_f =" + fac );
+                    /*ps.setString(1, Num_factura.getText());*/
+                    /*ps.setString(2, textFECHA.getText());*/
+                    /*ps.setString(2, .getText());*/
+                    ps.setString(1, subtotal_f.getText());
+                    ps.setString(2, iva_f.getText());
+                    ps.setString(3, descuento_f.getText());
+                    ps.setString(4, total_f.getText());
+                    ps.setString(5, textCEDULA.getText());
                     System.out.println(ps);
+
 
                     int res = ps.executeUpdate();
                     if(res >0){
@@ -326,6 +348,31 @@ public class cajero_producto{
                 }catch (Exception ex) {
                     ex.printStackTrace();
                 }
+                /*
+                try{
+                    Connection conexion;
+                    conexion = getConection();
+
+                    s = conexion.createStatement();
+                    rs = s.executeQuery("UPDATE ingreso SET cod_p = ?,nombre_p = ?, precio_unit_p= ?, cantidad_exist_p =? WHERE cod_p =");
+
+                    while (rs.next()) {
+                        textCAJERO.setText(rs.getString(1) + " " + rs.getString(2));
+                    }
+
+                    rs = s.executeQuery("Select num_f from cab_trans ORDER by num_f DESC LIMIT 1");
+
+                    while (rs.next()) {
+                        Num_factura.setText(rs.getString(1));
+                    }
+
+                    conexion.close();
+                    rs.close();
+                    s.close();
+                }catch(Exception ex){
+                    ex.printStackTrace();
+                }
+                */
 
                 /*AL GUARDAR SE ABRE LA VENTANA CON LA TRANSACCION REALIZADA*/
                 JFrame frame=new JFrame("Transaccion");

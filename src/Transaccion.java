@@ -15,7 +15,7 @@ public class Transaccion {
     private JFormattedTextField textAPELLIDO;
     private JFormattedTextField textDIRECCION;
 
-    private JFormattedTextField textID_CAJERO;
+    private JFormattedTextField textCAJERO;
     private JFormattedTextField textSUBTOTAL;
     private JFormattedTextField textIVA;
     private JFormattedTextField textDESCUENTO;
@@ -26,18 +26,51 @@ public class Transaccion {
     private JButton cerrarButton;
 
     DefaultTableModel modelo = new DefaultTableModel();
+    JFormattedTextField id_cajero = new JFormattedTextField();
     public Transaccion(){
         /*String[] titulo = new String[]{"CÓDIGO", "PRODUCTO", "CANTIDAD", "PRECIO"};
         modelo.setColumnIdentifiers(titulo);
         table.setModel(modelo);*/
+
         try{
             Connection conexion;
             conexion = getConection();
 
-            textFACTURA.setText("002 001 123456790");
-            String F = "\"" + textFACTURA.getText()+"\"";
             s = conexion.createStatement();
-            rs = s.executeQuery("SELECT * FROM det_trans WHERE FKnum_f = " + F);
+            rs = s.executeQuery("Select * from cab_trans ORDER by num_f DESC LIMIT 1");
+
+            while (rs.next()) {
+                textFACTURA.setText(rs.getString(1));
+                textFECHA.setText(rs.getString(2));
+                id_cajero.setText(rs.getString(3));
+                textSUBTOTAL.setText(rs.getString(4));
+                textIVA.setText(rs.getString(5));
+                textDESCUENTO.setText(rs.getString(6));
+                textTOTAL.setText(rs.getString(7));
+                textCEDULA.setText(rs.getString(8));
+            }
+
+            rs = s.executeQuery("SELECT nombres_caj, apellidos_caj FROM cajero WHERE id_caj =" + id_cajero.getText());
+
+            while (rs.next()) {
+                textCAJERO.setText(rs.getString(1) + " " + rs.getString(2));
+            }
+
+            conexion.close();
+            rs.close();
+            s.close();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+
+
+        try{
+            Connection conexion;
+            conexion = getConection();
+
+            String Fac = "\"" + textFACTURA.getText()+"\"";
+            s = conexion.createStatement();
+            rs = s.executeQuery("SELECT FKcod_p, cantidad_dt, precio_dt FROM det_trans WHERE FKnum_f = " + Fac);
 
             rsmd = rs.getMetaData();
             int columnCount = rsmd.getColumnCount();
@@ -48,7 +81,7 @@ public class Transaccion {
             modelo = (DefaultTableModel) table.getModel();
 
             // Add columns to table model
-            for (int i = 2; i <= columnCount; i++) {
+            for (int i = 1; i <= columnCount; i++) {
                 modelo.addColumn(rsmd.getColumnName(i));
             }
 
@@ -69,7 +102,6 @@ public class Transaccion {
         try {
            Connection conexion;
            conexion = getConection();
-           textCEDULA.setText("1727906070");
            String ci = textCEDULA.getText();
            s = conexion.createStatement();
            rs = s.executeQuery("SELECT * FROM cliente WHERE ci_cl =" + ci);
@@ -94,7 +126,6 @@ public class Transaccion {
         try {
             Connection conexion;
             conexion = getConection();
-            textFACTURA.setText("002 001 123456790");
 
             String fac = "\"" + textFACTURA.getText() + "\"";
             s = conexion.createStatement();
@@ -103,7 +134,7 @@ public class Transaccion {
             while (rs.next()) {
                 if (textFACTURA.getText().equals(rs.getString(1))) {
                     textFECHA.setText(rs.getString(2));
-                    textID_CAJERO.setText(rs.getString(3));
+                    textCAJERO.setText(rs.getString(3));
                     textSUBTOTAL.setText(rs.getString(4));
                     textIVA.setText(rs.getString(5));
                     textDESCUENTO.setText(rs.getString(6));
