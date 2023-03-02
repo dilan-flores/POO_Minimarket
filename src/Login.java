@@ -6,24 +6,24 @@ public class Login{
     Statement s;
     ResultSet rs;
     PreparedStatement ps;
+    int res;
     private JFormattedTextField textUSUARIO;
     private JPasswordField textCONTRA;
     public JPanel PanelLogin;
     private JButton INGRESARButton;
     private JLabel Imagen;
     private JComboBox comboBox;
-    JFormattedTextField contrasenia = new JFormattedTextField();
-    JFormattedTextField id_cajero = new JFormattedTextField();
-    JFormattedTextField nombre_caj = new JFormattedTextField();
-    JFormattedTextField apellido_caj = new JFormattedTextField();
-    JFormattedTextField transaccion = new JFormattedTextField();
-    Boolean correcto;
+    JFormattedTextField contrasenia = new JFormattedTextField();//Recibe contraseña de cajero o administrado
+    JFormattedTextField id_cajero = new JFormattedTextField();//Recibe el id del cajero
+    JFormattedTextField nombre_caj = new JFormattedTextField();//Recibe el nombre del cajero
+    JFormattedTextField apellido_caj = new JFormattedTextField();// Recibe el apellido del cajero
+    JFormattedTextField transaccion = new JFormattedTextField();// Proporciona un número de factura (transacción)
+    Boolean correcto; // Verifica si es correcto el ingreso
 
     public Login(){
-        //datos d = new datos();
-
         Imagen.setIcon( new ImageIcon("img/perfil.jpg"));
 
+        //Se carga los combo box
         comboBox.removeAllItems();
         comboBox.addItem(" ");
         comboBox.addItem("Administrador");
@@ -32,7 +32,7 @@ public class Login{
             @Override
             public void actionPerformed(ActionEvent e) {
                 correcto = false;
-                if("Administrador" == comboBox.getSelectedItem()){
+                if("Administrador" == comboBox.getSelectedItem()){//Si en el combo box se selecciona administrador
                     try{
                         Connection conexion;
                         conexion = getConection();
@@ -43,7 +43,7 @@ public class Login{
                         contrasenia.setText(new String(textCONTRA.getPassword()));
 
                         while (rs.next()) {
-
+                            //Se verifica si es correcto el usuario y contraseña
                             if(textUSUARIO.getText().equals(rs.getString(2)) && contrasenia.getText().equals(rs.getString(3))){
 
                                 Admin admin= new Admin();
@@ -54,7 +54,6 @@ public class Login{
                                 admin.setLocationRelativeTo(null);
                                 admin.setVisible(true);
                                 correcto = true;
-
                             }
                         }
                         if(!correcto){
@@ -67,7 +66,7 @@ public class Login{
                         ex.printStackTrace();
                     }
                 }
-                if("Cajero" == comboBox.getSelectedItem()){
+                if("Cajero" == comboBox.getSelectedItem()){//Si en el combo box se selecciona administrador
                     try{
                         Connection conexion;
                         conexion = getConection();
@@ -78,7 +77,7 @@ public class Login{
                         contrasenia.setText(new String(textCONTRA.getPassword()));
 
                         while (rs.next()) {
-
+                            //Verifica si es correcto el usuario y contraseña del cajero
                             if(textUSUARIO.getText().equals(rs.getString(2)) && contrasenia.getText().equals(rs.getString(3))){
                                 id_cajero.setText(rs.getString(1));
                                 correcto = true;
@@ -94,14 +93,15 @@ public class Login{
                         ex.printStackTrace();
                     }
 
-                    if(correcto){
-                        try{ /*Abre cajero*/
+                    if(correcto){// Si se ingresó correctamente
+                        try{ //Se abre cajero
                             Connection conexion;
                             conexion = getConection();
 
                             s = conexion.createStatement();
                             rs = s.executeQuery("SELECT nombres_caj, apellidos_caj FROM cajero WHERE id_caj =" + id_cajero.getText());
 
+                            //Se obtiene el nombrey apellido con el id del cajero
                             while (rs.next()) {
                                 nombre_caj.setText(rs.getString(1));
                                 apellido_caj.setText(rs.getString(2));
@@ -113,15 +113,14 @@ public class Login{
                             ex.printStackTrace();
                         }
 
-                        try { /*CABECERA DE TRANSACCIÓN inicializada*/
+                        try { //Se abre la cabecera de transacción
 
                             Connection conexion;
                             conexion = getConection();
 
                             s = conexion.createStatement();
                             rs = s.executeQuery("SELECT num_f FROM cab_trans ORDER by num_f DESC LIMIT 1");
-
-                            //encontrado = false;
+                            //Se obtiene el número de la última factura
                             while (rs.next()) {
                                 transaccion.setText(rs.getString(1));
                                 //encontrado = true;
@@ -129,16 +128,14 @@ public class Login{
                             String t = String.valueOf((Integer.parseUnsignedInt(transaccion.getText()) + 1));
                             transaccion.setText(t);
 
+                            // Se ingresa el número de transacicón y el id del cajero
                             ps = conexion.prepareStatement("Insert into cab_trans (num_f ,FKid_caj) values (?,?)");
                             ps.setString(1, transaccion.getText());
                             ps.setString(2, id_cajero.getText());
-                            //ps = conexion.prepareStatement("update cab_trans set fecha_f = (DATE(NOW())) where num_f =" + n_factura);
-                            System.out.println("cab_trans: " + ps);
+                            //System.out.println("cab_trans: " + ps);
 
-                            int res = ps.executeUpdate();
-                            if(res >0){
-                                JOptionPane.showMessageDialog(null,"GUARDADO cab_inicial");
-                            }else{
+                            res = ps.executeUpdate();
+                            if(!(res >0)){
                                 JOptionPane.showMessageDialog(null,"NO GUARDADO");
                             }
 
@@ -173,6 +170,7 @@ public class Login{
                         }
                         */
 
+                        //SE ABRE LA SIGUIENTE VENTANA
                         JFrame frame=new JFrame("CAJERO_PRODUCTO");
                         frame.setContentPane(new cajero_producto().panel);
                         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

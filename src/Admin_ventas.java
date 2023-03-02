@@ -19,7 +19,7 @@ public class Admin_ventas {
     private JComboBox id_cajero;
     DefaultTableModel modelo = new DefaultTableModel();
     Boolean encontrado = false;
-    String id;
+    String id; // id del cajero
 
 
     public Admin_ventas(){
@@ -46,8 +46,8 @@ public class Admin_ventas {
             @Override
             public void actionPerformed(ActionEvent e) {
                 encontrado=false;
-                try {
 
+                try {
                     Connection conexion;
                     conexion = getConection();
 
@@ -66,6 +66,9 @@ public class Admin_ventas {
 
                     if(!encontrado){
                         JOptionPane.showMessageDialog(null, "CAJERO NO ENCONTRADOS");
+                    }else{
+                        modelo.setColumnCount(0);// Se elimina la columna de la tabla
+                        modelo.setRowCount(0);// Se elimina la fila de la tabla
                     }
                     conexion.close();
                     rs.close();
@@ -79,22 +82,21 @@ public class Admin_ventas {
         revisarVentasButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                modelo.setColumnCount(0);
-                modelo.setRowCount(0);
-                try{
+
+                try{// Se carga la tabla de cajeros con el cajero agregado
                     Connection conexion;
                     conexion = getConection();
 
                     id = (String)id_cajero.getSelectedItem();
                     s = conexion.createStatement();
-                    rs = s.executeQuery("SELECT * FROM det_trans WHERE FKnum_f = (Select num_f from cab_trans where FKid_caj =" +id+ ")");
+                    rs = s.executeQuery("SELECT FKcod_p,cantidad_dt,precio_dt FROM det_trans WHERE FKnum_f = ANY (Select num_f from cab_trans where FKid_caj =" +id+ ")");
 
                     rsmd = rs.getMetaData();
                     int columnCount = rsmd.getColumnCount();
 
                     modelo = (DefaultTableModel) table.getModel();
 
-                    for (int i = 2; i <= columnCount; i++) {
+                    for (int i = 1; i <= columnCount; i++) {
                         modelo.addColumn(rsmd.getColumnName(i));
                     }
 
@@ -127,6 +129,7 @@ public class Admin_ventas {
         }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
 
+    /*
     public static void main(String[] args) {
         JFrame frame=new JFrame("ADMINISTRAR VENTAS INDIVIDUALES");
         frame.setContentPane(new Admin_ventas().Panel);
@@ -135,13 +138,12 @@ public class Admin_ventas {
         frame.setBounds(0,0,1000, 800);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-        /*ventana.add(Panel);*/
-        /*aplicacion.setSize(0,0,500,500);*/
-        /*
-        uso de combo box para guardar o comparar información de bases de datos, borrar todos los cmpos de un interfaz
-         */
-    }
+        //ventana.add(Panel);
+        //aplicacion.setSize(0,0,500,500);
 
+        //uso de combo box para guardar o comparar información de bases de datos, borrar todos los cmpos de un interfaz
+    }
+    */
     public static Connection getConection()
     {
         Connection conexion = null;

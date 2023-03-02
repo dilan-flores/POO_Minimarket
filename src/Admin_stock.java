@@ -10,6 +10,7 @@ public class Admin_stock {
     ResultSet rs;
     ResultSetMetaData rsmd;
     PreparedStatement ps;
+    int res;
     private JFormattedTextField textCODIGO;
     private JFormattedTextField textPRODUCTO;
     private JFormattedTextField textPRECIO;
@@ -23,15 +24,13 @@ public class Admin_stock {
     private JTable table;
     private JButton cerrarButton;
     DefaultTableModel modelo = new DefaultTableModel();
-    boolean encontrado = false;
-    String cod;
+    boolean encontrado;
+    String cod; //Código de producto
     JFormattedTextField actualizar_cantidad = new JFormattedTextField();
 
     public Admin_stock(){
-        /*String[] titulo = new String[]{"CÓDIGO", "PRODUCTO", "CANTIDAD", "PRECIO"};
-        modelo.setColumnIdentifiers(titulo);
-        table.setModel(modelo);*/
-        try{
+
+        try{//Se carga los prodcutos existentes en stock
             Connection conexion;
             conexion = getConection();
             s = conexion.createStatement();
@@ -62,11 +61,12 @@ public class Admin_stock {
             conexion.close();
         }catch (Exception ex) {
             ex.printStackTrace();
-        }
+        }//Fin stock
 
         buscarButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                encontrado = false;
                 try {
                     Connection conexion;
                     conexion = getConection();
@@ -75,7 +75,6 @@ public class Admin_stock {
                     s = conexion.createStatement();
                     rs = s.executeQuery("SELECT * FROM stock WHERE cod_p =" + cod);
 
-                    encontrado = false;
                     while (rs.next()) {
                         textPRODUCTO.setText(rs.getString(2));
                         textPRECIO.setText(rs.getString(3));
@@ -99,8 +98,7 @@ public class Admin_stock {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                /*Altualiza la cantidad de un producto en STOCK*/
-                try{
+                try{/*Altualiza la cantidad de un producto en STOCK(Agregar más)*/
 
                     Connection conexion;
                     conexion = getConection();
@@ -112,22 +110,23 @@ public class Admin_stock {
                     ps.setString(1, actualizar_cantidad.getText());
 
 
-                    int res = ps.executeUpdate();
+                    res = ps.executeUpdate();
                     if(res >0){
-                        JOptionPane.showMessageDialog(null,"PRODUCTO" + textCODIGO.getText() + " ACTUALIZADO");
-                        modelo.setColumnCount(0);
-                        modelo.setRowCount(0);
+                        JOptionPane.showMessageDialog(null,"PRODUCTO ACTUALIZADO");
+                        modelo.setColumnCount(0);//Se elimina la columna de la tabla
+                        modelo.setRowCount(0);// se elimina la fila de la tabla
                     }else{
-                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                        JOptionPane.showMessageDialog(null,"PRODUCTO NO ACTUALIZADO");
                     }
                     conexion.close();//importante!!!!
-
-
                     ps.close();
+
                 }catch (Exception ex) {
                     ex.printStackTrace();
                 }
-                try{
+
+
+                try{ // Se agrega nuevamente la tabla con la cantidad de un producto actualizada
                     Connection conexion;
                     conexion = getConection();
 
@@ -138,7 +137,7 @@ public class Admin_stock {
                     int columnCount = rsmd.getColumnCount();
 
 
-                    // Create JTable and set model
+                    //Crea una tabla y envía el modelo
                     modelo = (DefaultTableModel) table.getModel();
 
                     for (int i = 1; i <= columnCount; i++) {
@@ -164,7 +163,7 @@ public class Admin_stock {
         agregarNuevoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {/*LLENAR DETALLE DE TRANSFERENCIA*/
+                try {//Ingresar nuevo producto
 
                     Connection conexion;
                     conexion = getConection();
@@ -176,13 +175,13 @@ public class Admin_stock {
                     ps.setString(3, textPRECIO.getText());
                     ps.setString(4, textCANTIDAD_A_AGREGAR.getText());
 
-                    int res = ps.executeUpdate();
+                    res = ps.executeUpdate();
                     if(res >0){
-                        JOptionPane.showMessageDialog(null,"CABECERA DE FACTURA");
-                        modelo.setColumnCount(0);
-                        modelo.setRowCount(0);
+                        JOptionPane.showMessageDialog(null,"PRODUCTO AGREGADO");
+                        modelo.setColumnCount(0); //Se elimina la coluna de la tabla
+                        modelo.setRowCount(0); // se elimina la fila de la tabla
                     }else{
-                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                        JOptionPane.showMessageDialog(null,"PRODUCTO NO GUARDADO");
                     }
 
                     conexion.close();
@@ -191,7 +190,7 @@ public class Admin_stock {
                     ex.printStackTrace();
                 }
 
-                try{
+                try{//Se carga nuevamente la tabla con el producto agregado
                     Connection conexion;
                     conexion = getConection();
 
@@ -238,11 +237,9 @@ public class Admin_stock {
             }
         }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
-
+    /*
     public static void main(String[] args) {
-        /*
-        uso de combo box para guardar o comparar información de bases de datos, borrar todos los cmpos de un interfaz
-         */
+        //uso de combo box para guardar o comparar información de bases de datos, borrar todos los cmpos de un interfaz
         JFrame frame=new JFrame("ADMINISTRAR STOCK");
         frame.setContentPane(new Admin_stock().Panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -251,6 +248,7 @@ public class Admin_stock {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+     */
 
     public static Connection getConection()
     {

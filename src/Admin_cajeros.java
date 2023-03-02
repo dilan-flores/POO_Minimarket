@@ -9,6 +9,7 @@ public class Admin_cajeros {
     ResultSet rs;
     ResultSetMetaData rsmd;
     PreparedStatement ps;
+    int res;
     private JButton agregarButton;
     private JFormattedTextField textID_CAJERO;
     private JFormattedTextField textNOMBRE;
@@ -24,15 +25,10 @@ public class Admin_cajeros {
     private JTable table;
 
     DefaultTableModel modelo = new DefaultTableModel();
-    Boolean encontrado = false;
+    Boolean encontrado;
 
     public Admin_cajeros(){
-        /*
-        String[] titulo = new String[]{"ID", "NOMBRES", "APRELLIDOS", "TELÉFONO", "DIRECCION", "FECHA NACIMIENTO", "USUARIO"};
-        modelo.setColumnIdentifiers(titulo);
-        table.setModel(modelo);
-        */
-        try{
+        try{// Abre cajero
             Connection conexion;
             conexion = getConection();
             s = conexion.createStatement();
@@ -42,8 +38,7 @@ public class Admin_cajeros {
             int columnCount = rsmd.getColumnCount();
 
 
-            // Create JTable and set model
-            /*table = new JTable();*/
+            // Crea una tabla y envía a modelo
             modelo = (DefaultTableModel) table.getModel();
 
             // Add columns to table model
@@ -69,7 +64,7 @@ public class Admin_cajeros {
             @Override
             public void actionPerformed(ActionEvent e) {
                 encontrado=false;
-                try {
+                try {// Abre cajerp
                     Connection conexion;
                     conexion = getConection();
 
@@ -77,7 +72,6 @@ public class Admin_cajeros {
                     s = conexion.createStatement();
                     rs = s.executeQuery("SELECT * FROM cajero WHERE id_caj =" + id);
 
-                    encontrado = false;
                     while (rs.next()) {
                         textNOMBRE.setText(rs.getString(2));
                         textAPELLIDO.setText(rs.getString(3));
@@ -103,22 +97,20 @@ public class Admin_cajeros {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-
                     Connection conexion;
                     conexion = getConection();
 
-                    ps = conexion.prepareStatement("Insert into cajero values (?,?,?,?,?)");
+                    ps = conexion.prepareStatement("Insert into cajero values (?,?,?,?,?,?)");
                     ps.setString(1, textID_CAJERO.getText());
                     ps.setString(2, textNOMBRE.getText());
                     ps.setString(3, textAPELLIDO.getText());
                     ps.setString(4, textCELULAR.getText());
-                    ps.setString(5, textFEC_NAC.getText());
+                    ps.setString(5, textDIRECCION.getText());
+                    ps.setString(6, textFEC_NAC.getText());
 
-                    int res = ps.executeUpdate();
-                    if(res >0){
-                        JOptionPane.showMessageDialog(null,"CAJERO INGRESADO CON ÉXITO");
-                    }else{
-                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                    res = ps.executeUpdate();
+                    if(!(res >0)){
+                        JOptionPane.showMessageDialog(null,"CAJERO NO GUADADO");
                     }
 
                     conexion.close();
@@ -127,7 +119,7 @@ public class Admin_cajeros {
                     ex.printStackTrace();
                 }
 
-                try {
+                try {//Cargar datos en login_cajero
                     Connection conexion;
                     conexion = getConection();
 
@@ -136,17 +128,17 @@ public class Admin_cajeros {
                     ps.setString(2, textUSUARIO.getText());
                     ps.setString(3, testCONTRA.getText());
 
-                    int res = ps.executeUpdate();
+                    res = ps.executeUpdate();
                     if(res >0){
-                        JOptionPane.showMessageDialog(null,"CABECERA DE FACTURA");
-                        modelo.setColumnCount(0);
-                        modelo.setRowCount(0);
+                        JOptionPane.showMessageDialog(null,"CAJERO AGREGADO");
+                        modelo.setColumnCount(0); // Se elimina la columna de tabla
+                        modelo.setRowCount(0);// Se elimina la fila de tabla
                     }else{
-                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                        JOptionPane.showMessageDialog(null,"CAJERO NO GUARDADO");
                     }
-
                     conexion.close();
                     ps.close();
+
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -160,12 +152,10 @@ public class Admin_cajeros {
                     rsmd = rs.getMetaData();
                     int columnCount = rsmd.getColumnCount();
 
-
-                    // Create JTable and set model
-                    /*table = new JTable();*/
+                    // tabla envía a modelo
                     modelo = (DefaultTableModel) table.getModel();
 
-                    // Add columns to table model
+                    // Agregar columnas en modelo
                     for (int i = 1; i <= columnCount; i++) {
                         modelo.addColumn(rsmd.getColumnName(i));
                     }
@@ -199,11 +189,11 @@ public class Admin_cajeros {
             }
         }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
-
+    /*
     public static void main(String[] args) {
-        /*
-        uso de combo box para guardar o comparar información de bases de datos, borrar todos los cmpos de un interfaz
-         */
+
+        //uso de combo box para guardar o comparar información de bases de datos, borrar todos los cmpos de un interfaz
+
         JFrame frame=new JFrame("ADMINISTRAR CAJERO");
         frame.setContentPane(new Admin_cajeros().Panel);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -212,6 +202,7 @@ public class Admin_cajeros {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+    */
     public static Connection getConection()
     {
         Connection conexion = null;

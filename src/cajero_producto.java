@@ -3,17 +3,13 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-/*
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-*/
 
 public class cajero_producto{
     Statement s;
     ResultSet rs;
     PreparedStatement ps;
+    int res;
     public JPanel panel;
-    private JButton eliminarPRODUCTO;
     private JButton guardarPRODUCTO;
     private JButton buscarPRODUCTO;
     private JFormattedTextField textPRECIO;
@@ -32,27 +28,27 @@ public class cajero_producto{
     private JTable table;
     private JButton cerrarCajaButton;
     private JFormattedTextField textCAJERO;
-    /*private JFormattedTextField textFECHA;*/
     DefaultTableModel modelo = new DefaultTableModel();
     boolean encontrado; // verifica si se encontro el cliente
     JFormattedTextField precio_total_producto = new JFormattedTextField(); /*Precio de un producto (cantidad * precio_unit)*/
     JFormattedTextField actualizar_cantidad = new JFormattedTextField();/*actualizacón de cantidad de productos en stock*/
-    JFormattedTextField subtotal_f = new JFormattedTextField();
-    JFormattedTextField iva_f = new JFormattedTextField();
-    JFormattedTextField descuento_f = new JFormattedTextField();
-    JFormattedTextField total_f = new JFormattedTextField();
-    JFormattedTextField Num_factura = new JFormattedTextField();
+    JFormattedTextField subtotal_f = new JFormattedTextField(); /*subtotal final para transacciòn*/
+    JFormattedTextField iva_f = new JFormattedTextField();/*iva final para transacción*/
+    JFormattedTextField descuento_f = new JFormattedTextField();/*descuento final para transacción*/
+    JFormattedTextField total_f = new JFormattedTextField();/*total final para transacción*/
+    JFormattedTextField Num_factura = new JFormattedTextField();/*número de la transacción*/
 
-    String SUBTOTAL = String.valueOf(0.0);
-    String IVA = String.valueOf(0.0);
-    String TOTAL= String.valueOf(0.0);
+    String SUBTOTAL = String.valueOf(0.0);/*Realiza un proceso: suma de los precios*/
+    String IVA = String.valueOf(0.0);/*Realiza un proceso: calcula el iva de subtotal*/
+    String DESCUENTO= String.valueOf(0.0);/*Realiza un proceso: calcula el descuento */
 
+    String TOTAL= String.valueOf(0.0);/*Realiza un proceso: calcula el total(subtotal+iva-descuento)*/
 
     public cajero_producto() {
 
-        descuento_f.setText("0.10");
+        /*descuento_f.setText("0.10");*/
 
-        try{ /*Nombre del cajero*/
+        try{ /*Se obtiene el nombre completo del cajero*/
             Connection conexion;
             conexion = getConection();
 
@@ -74,12 +70,13 @@ public class cajero_producto{
             s.close();
         }catch(Exception ex){
             ex.printStackTrace();
-        }
+        }//Fin obtener nombre del cajero
 
         buscarCLIENTE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
+                encontrado = false;
+                try { // Se busca al cliente por medio de la cédula
                     Connection conexion;
                     conexion = getConection();
 
@@ -88,14 +85,12 @@ public class cajero_producto{
                     s = conexion.createStatement();
                     rs = s.executeQuery("SELECT * FROM cliente WHERE ci_cl = " + id);
 
-                    encontrado = false;
                     while (rs.next()) {
                             textNOMBRE.setText(rs.getString(2));
                             textAPELLIDO.setText(rs.getString(3));
                             textCELULAR.setText(rs.getString(4));
                             textDIRECCION.setText(rs.getString(5));
                             encontrado = true;
-
                     }
 
                     if(!encontrado){
@@ -108,12 +103,12 @@ public class cajero_producto{
                     ex.printStackTrace();
                 }
             }
-        }); /*FIN BUSCAR CLIENTE*/
+        }); // Fin buscar cliente
 
         registrarCLIENTE.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
+                try {/* Registra un nuevo cliente*/
                     Connection conexion;
                     conexion = getConection();
 
@@ -124,32 +119,26 @@ public class cajero_producto{
                     ps.setString(4, textCELULAR.getText());
                     ps.setString(5, textDIRECCION.getText());
 
-                    /*
-                    cbCANTIDAD.setSelectedItem(cantidad.getText());
-                    cbVENCIDA.setSelectedItem(vencido.getText());
-                     */
-
-                    int res = ps.executeUpdate();
+                    res = ps.executeUpdate();
                     if(res >0){
-                        JOptionPane.showMessageDialog(null,"CREACIÓN CON ÉXITO");
+                        JOptionPane.showMessageDialog(null,"CLIENTE " + textNOMBRE.getText() + " agregado");
                     }else{
-                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                        JOptionPane.showMessageDialog(null,"CLIENTE NO GUARDADO");
                     }
 
                     conexion.close();
-                    rs.close();
-                    s.close();
                     ps.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
-        });/*FIN REGISTRAR CLIENTE*/
+        });//FIN REGISTRAR CLIENTE
 
         buscarPRODUCTO.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
+                encontrado = false;
+                try {// Busca un producto por medio del código
                     Connection conexion;
                     conexion = getConection();
 
@@ -157,7 +146,6 @@ public class cajero_producto{
                     s = conexion.createStatement();
                     rs = s.executeQuery("SELECT * FROM stock WHERE cod_p =" + cod);
 
-                    encontrado = false;
                     while (rs.next()) {
                         textPRODUCTO.setText(rs.getString(2));
                         textPRECIO.setText(rs.getString(3));
@@ -179,6 +167,7 @@ public class cajero_producto{
             }
         }); /*FIN BUSCAR PRODUCTO*/
 
+        //Se agrega la cabecera de la tabla
         String[] titulo = new String[]{"CÓDIGO", "PRODUCTO", "CANTIDAD", "PRECIO"};
         modelo.setColumnIdentifiers(titulo);
         table.setModel(modelo);
@@ -233,10 +222,19 @@ public class cajero_producto{
         agregarPRODUCTO.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Se obtiene le precio total de un producto(cantidad * precio)
                 precio_total_producto.setText(String.valueOf(Integer.parseInt(textCANTIDAD_A_COMPRAR.getText())*Float.parseFloat(textPRECIO.getText())));
                 agregar();
 
-                try {/*LLENAR DETALLE DE TRANSFERENCIA*/
+                if(textCODIGO.getText().equals("aa10")){// Se obtiene el descuento del 10% de un producto en particular
+                    descuento_f.setText(String.valueOf(Integer.parseUnsignedInt(precio_total_producto.getText())*0.10));
+                }else{
+                    descuento_f.setText(String.valueOf(0.0));
+                }
+
+                DESCUENTO = DESCUENTO + descuento_f;
+
+                try {// Ingresa los productos al detalle de transacción
 
                     Connection conexion;
                     conexion = getConection();
@@ -249,24 +247,18 @@ public class cajero_producto{
 
                     SUBTOTAL = String.valueOf(Double.parseDouble(SUBTOTAL) + Double.parseDouble(precio_total_producto.getText()));
 
-                    int res = ps.executeUpdate();
-                    if(res >0){
-                        JOptionPane.showMessageDialog(null,"CABECERA DE FACTURA");
-                    }else{
-                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                    res = ps.executeUpdate();
+                    if(!(res >0)){
+                        JOptionPane.showMessageDialog(null,"PRODUCTO EN DETALLE DE TRANSACCIÓN NO GUARDADO");
                     }
 
                     conexion.close();
-                    rs.close();
-                    s.close();
                     ps.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                }
+                }// Fin detalle de transacción
 
-
-                /*Altualiza la cantidad de un producto en STOCK*/
-                try{
+                try{//Actualiza la cantidad de un producto en STOCK
 
                     Connection conexion;
                     conexion = getConection();
@@ -281,39 +273,41 @@ public class cajero_producto{
                     ps.setString(4, actualizar_cantidad.getText());
 
 
-                    int res = ps.executeUpdate();
-                    if(res >0){
-                        JOptionPane.showMessageDialog(null,"PRODUCTO" + textCODIGO.getText() + " ACTUALIZADO");
-                    }else{
-                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                    res = ps.executeUpdate();
+                    if(!(res >0)){
+                        JOptionPane.showMessageDialog(null,"CANTIDAD DE PRODUCTO NO ACTUALIZADO");
                     }
+
                     conexion.close();//importante!!!!
-                    rs.close();
-                    s.close();
                     ps.close();
                 }catch (Exception ex) {
                     ex.printStackTrace();
-                }
+                }// FIN DE ACTUALIZACIÓN DE STOCK
             }
         });
+        /*
         eliminarPRODUCTO.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 eliminar();
             }
         });
+         */
 
         guardarPRODUCTO.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                /*ACTUALIZA CABECERA DE TRANSACCIÓN*/
-                try{
+
+                try{// Ingresa campos pendientes en CABECERA DE TRANSACCIÓN
                     SUBTOTAL = SUBTOTAL.substring(0,3);
                     subtotal_f.setText(SUBTOTAL);
 
                     IVA = String.valueOf(Double.parseDouble(SUBTOTAL) * 0.12);
                     IVA = IVA.substring(0,3);
                     iva_f.setText(IVA);
+
+                    DESCUENTO = DESCUENTO.substring(0,3);
+                    descuento_f.setText(DESCUENTO);
 
                     TOTAL = String.valueOf(Double.parseDouble(SUBTOTAL)  + Double.parseDouble(IVA) - Double.parseDouble(descuento_f.getText()));
                     TOTAL = TOTAL.substring(0,3);
@@ -324,9 +318,6 @@ public class cajero_producto{
 
                     String fac= "\"" + Num_factura.getText() +"\"";
                     ps = conexion.prepareStatement("UPDATE cab_trans SET fecha_f= concat(DATE(NOW()),\" \", TIME(NOW())),subtotal_f =?,iva_f =?,descuento_f=?,total_f=?,  FKci_cl = ? WHERE num_f =" + fac );
-                    /*ps.setString(1, Num_factura.getText());*/
-                    /*ps.setString(2, textFECHA.getText());*/
-                    /*ps.setString(2, .getText());*/
                     ps.setString(1, subtotal_f.getText());
                     ps.setString(2, iva_f.getText());
                     ps.setString(3, descuento_f.getText());
@@ -335,11 +326,9 @@ public class cajero_producto{
                     System.out.println(ps);
 
 
-                    int res = ps.executeUpdate();
-                    if(res >0){
-                        JOptionPane.showMessageDialog(null,"GUARDADO CAB_TRANSACCION");
-                    }else{
-                        JOptionPane.showMessageDialog(null,"NO GUARDADO cab ");
+                    res = ps.executeUpdate();
+                    if(!(res >0)){
+                        JOptionPane.showMessageDialog(null,"DATOS EN CABECERA DE TRANSACCIÓN NO GUARDADOS");
                     }
                     conexion.close();//importante!!!!
                     rs.close();
@@ -347,7 +336,7 @@ public class cajero_producto{
                     ps.close();
                 }catch (Exception ex) {
                     ex.printStackTrace();
-                }
+                }//Fin cabecera de transacción
                 /*
                 try{
                     Connection conexion;
@@ -385,7 +374,7 @@ public class cajero_producto{
             }
         }); /*FIN GUARDAR PRODCUTOS*/
 
-        cerrarCajaButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR*/
+        cerrarCajaButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR(LOGIN)*/
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFrame frame=new JFrame("LOGIN");
@@ -399,15 +388,16 @@ public class cajero_producto{
         }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
 
-    public void agregar(){
+    public void agregar(){//Agrega a la tabla los producto comprados
         modelo.addRow(new Object[]{textCODIGO.getText(),textPRODUCTO.getText(),textCANTIDAD_A_COMPRAR.getText(),precio_total_producto.getText()});
     }
-
+    /*
     public void eliminar() {
         int fila = table.getSelectedRow();
         modelo.removeRow(fila);
     }
-
+    */
+    /*
     public static void main(String[] args) {
         JFrame frame=new JFrame("CAJERO_PRODUCTO");
         frame.setContentPane(new cajero_producto().panel);
@@ -417,6 +407,7 @@ public class cajero_producto{
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+    */
 
     public static Connection getConection()
     {

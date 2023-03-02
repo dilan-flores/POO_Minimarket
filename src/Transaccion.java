@@ -164,7 +164,7 @@ public class Transaccion {
         }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
 
     }
-
+    /*
     public static void main(String[] args) {
         JFrame frame=new JFrame("Transaccion");
         frame.setContentPane(new Transaccion().Panel);
@@ -174,6 +174,7 @@ public class Transaccion {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+    */
 
     public static Connection getConection()
     {
