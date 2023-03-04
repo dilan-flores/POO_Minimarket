@@ -13,6 +13,7 @@ public class Login{
     private JButton INGRESARButton;
     private JLabel Imagen;
     private JComboBox comboBox;
+    private JLabel logo;
     JFormattedTextField contrasenia = new JFormattedTextField();//Recibe contraseña de cajero o administrado
     JFormattedTextField id_cajero = new JFormattedTextField();//Recibe el id del cajero
     JFormattedTextField nombre_caj = new JFormattedTextField();//Recibe el nombre del cajero
@@ -22,6 +23,7 @@ public class Login{
 
     public Login(){
         Imagen.setIcon( new ImageIcon("img/perfil.jpg"));
+        logo.setIcon( new ImageIcon("img/logo.png"));
 
         //Se carga los combo box
         comboBox.removeAllItems();

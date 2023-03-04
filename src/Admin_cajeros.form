@@ -22,6 +22,7 @@
         </constraints>
         <properties>
           <font name="Arial" size="20" style="1"/>
+          <foreground color="-15758708"/>
           <text value="Registrar cajero"/>
         </properties>
       </component>
@@ -30,6 +31,8 @@
           <grid row="9" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <background color="-8765886"/>
+          <foreground color="-1"/>
           <text value="Cerrar"/>
         </properties>
       </component>
@@ -59,7 +62,7 @@
           <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Buscar"/>
+          <text value="🔎 Buscar"/>
         </properties>
       </component>
       <component id="bf5ba" class="javax.swing.JLabel">

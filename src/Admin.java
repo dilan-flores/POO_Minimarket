@@ -6,6 +6,7 @@ public class Admin extends JFrame implements ActionListener{
     private JMenuBar barra;
     private JMenu menu1;
     private JMenuItem STOCK, VENTAS, VENTAS_INDIVIDUALES, CAJEROS;
+    private JButton cerrarButton = new JButton(" SALIR ");
 
     public Admin(){
         barra = new JMenuBar();
@@ -28,6 +29,21 @@ public class Admin extends JFrame implements ActionListener{
         CAJEROS = new JMenuItem("AGREGAR CAJEROS");
         menu1.add(CAJEROS);
         CAJEROS.addActionListener(this);
+
+        menu1.add(cerrarButton);
+
+        cerrarButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR*/
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame frame=new JFrame("LOGIN");
+                frame.setContentPane(new Login().PanelLogin);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setBounds(0,0,1000, 800);
+                frame.setLocationRelativeTo(null);
+                frame.setVisible(true);
+            }
+        }); /*CERRAR Y PASAR A VENTANA ANTERIOR*/
     }
     public void actionPerformed(ActionEvent e){
         if(e.getSource()==STOCK){
@@ -40,15 +56,13 @@ public class Admin extends JFrame implements ActionListener{
             frame.setVisible(true);
         }
         if(e.getSource()==VENTAS){
-            /*
-            JFrame frame=new JFrame("ADMINISTRAR STOCK");
-            frame.setContentPane(new Admin_stock().Panel);
+            JFrame frame=new JFrame("ADMINISTRAR VENTAS GENERALES");
+            frame.setContentPane(new Admin_ventasGeneral().Panel);
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.pack();
             frame.setBounds(0,0,1000, 800);
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-             */
         }
         if(e.getSource()==VENTAS_INDIVIDUALES){
             JFrame frame=new JFrame("ADMINISTRAR VENTAS INDIVIDUALES");

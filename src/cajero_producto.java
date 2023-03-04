@@ -94,7 +94,7 @@ public class cajero_producto{
                     }
 
                     if(!encontrado){
-                        JOptionPane.showMessageDialog(null, "DATOS NO ENCONTRADOS");
+                        JOptionPane.showMessageDialog(null, "CLIENTE NO ENCONTRADOS");
                     }
                     conexion.close();
                     rs.close();
@@ -227,12 +227,14 @@ public class cajero_producto{
                 agregar();
 
                 if(textCODIGO.getText().equals("aa10")){// Se obtiene el descuento del 10% de un producto en particular
-                    descuento_f.setText(String.valueOf(Integer.parseUnsignedInt(precio_total_producto.getText())*0.10));
+                    descuento_f.setText(String.valueOf(Float.parseFloat(precio_total_producto.getText())*0.10));
                 }else{
                     descuento_f.setText(String.valueOf(0.0));
                 }
 
-                DESCUENTO = DESCUENTO + descuento_f;
+                DESCUENTO = String.valueOf(Float.parseFloat(DESCUENTO) + Float.parseFloat(descuento_f.getText()));
+
+                descuento_f.setText(String.valueOf(0.0));
 
                 try {// Ingresa los productos al detalle de transacción
 
@@ -308,6 +310,8 @@ public class cajero_producto{
 
                     DESCUENTO = DESCUENTO.substring(0,3);
                     descuento_f.setText(DESCUENTO);
+                    System.out.println(DESCUENTO);
+                    System.out.println(descuento_f.getText());
 
                     TOTAL = String.valueOf(Double.parseDouble(SUBTOTAL)  + Double.parseDouble(IVA) - Double.parseDouble(descuento_f.getText()));
                     TOTAL = TOTAL.substring(0,3);
@@ -381,7 +385,7 @@ public class cajero_producto{
                 frame.setContentPane(new Login().PanelLogin);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.pack();
-                frame.setBounds(0,0,600, 400);
+                frame.setBounds(0,0,1000, 800);
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
             }
