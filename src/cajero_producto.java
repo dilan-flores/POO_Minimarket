@@ -28,6 +28,7 @@ public class cajero_producto{
     private JTable table;
     private JButton cerrarCajaButton;
     private JFormattedTextField textCAJERO;
+    private JButton nuevaCajaButton;
     DefaultTableModel modelo = new DefaultTableModel();
     boolean encontrado; // verifica si se encontro el cliente
     JFormattedTextField precio_total_producto = new JFormattedTextField(); /*Precio de un producto (cantidad * precio_unit)*/
@@ -37,6 +38,8 @@ public class cajero_producto{
     JFormattedTextField descuento_f = new JFormattedTextField();/*descuento final para transacción*/
     JFormattedTextField total_f = new JFormattedTextField();/*total final para transacción*/
     JFormattedTextField Num_factura = new JFormattedTextField();/*número de la transacción*/
+    JFormattedTextField transaccion = new JFormattedTextField();/*número de la transacción en nueva caja*/
+    JFormattedTextField id_cajero = new JFormattedTextField();/*id del cajero de la misma transacción anterior*/
 
     String SUBTOTAL = String.valueOf(0.0);/*Realiza un proceso: suma de los precios*/
     String IVA = String.valueOf(0.0);/*Realiza un proceso: calcula el iva de subtotal*/
@@ -378,6 +381,45 @@ public class cajero_producto{
             }
         }); /*FIN GUARDAR PRODCUTOS*/
 
+        nuevaCajaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try { //Se abre la cabecera de transacción
+
+                    Connection conexion;
+                    conexion = getConection();
+
+                    s = conexion.createStatement();
+                    rs = s.executeQuery("SELECT num_f,FKid_caj FROM cab_trans ORDER BY num_f  DESC LIMIT 1");
+                    //Se obtiene el número de la última factura
+                    while (rs.next()) {
+                        transaccion.setText(rs.getString(1));
+                        id_cajero.setText(rs.getString(2));
+                    }
+                    Num_factura.setText(String.valueOf((Integer.parseUnsignedInt(transaccion.getText()) + 1)));
+                    transaccion.setText(Num_factura.getText());
+
+                    // Se ingresa el número de transacicón y el id del cajero
+                    ps = conexion.prepareStatement("Insert into cab_trans (num_f ,FKid_caj) values (?,?)");
+                    ps.setString(1, transaccion.getText());
+                    ps.setString(2, id_cajero.getText());
+                    //System.out.println("cab_trans: " + ps);
+
+                    res = ps.executeUpdate();
+                    if(!(res >0)){
+                        JOptionPane.showMessageDialog(null,"NO GUARDADO");
+                    }
+
+                    conexion.close();
+                    rs.close();
+                    s.close();
+                    ps.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }); // Fin buscar cliente
+
         cerrarCajaButton.addActionListener(new ActionListener() {/*CERRAR Y PASAR A VENTANA ANTERIOR(LOGIN)*/
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -415,7 +457,7 @@ public class cajero_producto{
 
     public static Connection getConection()
     {
-        Connection conexion = null;
+        Connection conexion;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conexion = DriverManager.getConnection(

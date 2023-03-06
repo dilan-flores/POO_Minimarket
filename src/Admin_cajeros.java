@@ -82,7 +82,7 @@ public class Admin_cajeros {
                     }
 
                     if(!encontrado){
-                        JOptionPane.showMessageDialog(null, "PRODUCTO NO ENCONTRADOS");
+                        JOptionPane.showMessageDialog(null, "CAJERO NO ENCONTRADOS");
                     }
                     conexion.close();
                     rs.close();
@@ -205,7 +205,7 @@ public class Admin_cajeros {
     */
     public static Connection getConection()
     {
-        Connection conexion = null;
+        Connection conexion;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conexion = DriverManager.getConnection(

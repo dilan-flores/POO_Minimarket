@@ -252,7 +252,7 @@ public class Admin_stock {
 
     public static Connection getConection()
     {
-        Connection conexion = null;
+        Connection conexion;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conexion = DriverManager.getConnection(
