@@ -1,6 +1,8 @@
 # POO_Minimarket
 La empresa de desarrollo de software "El búho" implementa una solución para el minimarket "Don Justo"
 
+Link manual de usuario: https://youtu.be/abqaMw1RezQ
+
 # Librerías necesarias
 Para conexión con BD
 ![libreria_conector](https://user-images.githubusercontent.com/117755180/222908329-fb4a6797-f52a-4889-a694-86b343269d17.png)
